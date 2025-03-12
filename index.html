@@ -52,7 +52,6 @@
                 class="rounded-full mx-auto border-4 border-indigo-500 shadow-lg w-24 h-24">
             <h2 class="text-2xl font-bold mt-2">Online Notes App</h2>
             <p class="text-gray-600 dark:text-gray-300">Developed by Krish Solanki</p>
-           
         </div>
 
         <!-- Search Bar -->
@@ -92,16 +91,16 @@
         </div>
     </div>
 
-    <!-- PDF Preview Modal -->
-    <div id="pdf-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center">
+    <!-- File Preview Modal -->
+    <div id="file-preview-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center">
         <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg w-11/12 max-w-4xl glassmorphism">
             <div class="flex justify-between items-center mb-4">
-                <h3 class="text-xl font-bold dark:text-white">PDF Preview</h3>
-                <button onclick="closePdfModal()" class="text-gray-500 hover:text-gray-700 dark:text-gray-300">
+                <h3 class="text-xl font-bold dark:text-white">File Preview</h3>
+                <button onclick="closeFilePreviewModal()" class="text-gray-500 hover:text-gray-700 dark:text-gray-300">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            <div id="pdf-viewer" class="h-[80vh] overflow-auto"></div>
+            <div id="file-preview-content" class="h-[80vh] overflow-auto"></div>
         </div>
     </div>
 
@@ -136,7 +135,7 @@
 
             let reader = new FileReader();
             reader.onload = function () {
-                let fileData = file ? { name: file.name, data: reader.result } : null;
+                let fileData = file ? { name: file.name, data: reader.result, type: file.type } : null;
                 let notes = getStoredNotes();
 
                 if (editingIndex !== null) {
@@ -192,8 +191,8 @@
                 <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Date: ${note.date}</p>
                 ${note.file ? `
                     <div class="mt-2">
-                        <button onclick="openPdfModal('${note.file.data}')" class="bg-blue-500 text-white px-3 py-1 rounded-lg btn">
-                            <i class="fas fa-eye"></i> Preview PDF
+                        <button onclick="openFilePreviewModal('${note.file.data}', '${note.file.type}')" class="bg-blue-500 text-white px-3 py-1 rounded-lg btn">
+                            <i class="fas fa-eye"></i> Preview File
                         </button>
                         <a href="${note.file.data}" download="${note.file.name}" class="bg-green-500 text-white px-3 py-1 rounded-lg btn">
                             <i class="fas fa-download"></i> Download
@@ -210,6 +209,52 @@
                 </div>
             `;
             return noteDiv;
+        }
+
+        /**
+         * Opens the file preview modal.
+         */
+        function openFilePreviewModal(fileData, fileType) {
+            const filePreviewContent = document.getElementById("file-preview-content");
+            filePreviewContent.innerHTML = ""; // Clear previous content
+
+            if (fileType.startsWith("image/")) {
+                // Display image
+                filePreviewContent.innerHTML = `<img src="${fileData}" alt="Preview" class="w-full h-auto">`;
+            } else if (fileType === "application/pdf") {
+                // Render PDF using PDF.js
+                pdfjsLib.getDocument({ data: atob(fileData.split(",")[1]) }).promise.then(pdf => {
+                    for (let i = 1; i <= pdf.numPages; i++) {
+                        pdf.getPage(i).then(page => {
+                            const canvas = document.createElement("canvas");
+                            const context = canvas.getContext("2d");
+                            const viewport = page.getViewport({ scale: 1.5 });
+
+                            canvas.height = viewport.height;
+                            canvas.width = viewport.width;
+
+                            filePreviewContent.appendChild(canvas);
+
+                            page.render({
+                                canvasContext: context,
+                                viewport: viewport
+                            });
+                        });
+                    }
+                });
+            } else {
+                // Unsupported file type
+                filePreviewContent.innerHTML = `<p class="text-center">Preview not available. Please download the file.</p>`;
+            }
+
+            document.getElementById("file-preview-modal").classList.remove("hidden");
+        }
+
+        /**
+         * Closes the file preview modal.
+         */
+        function closeFilePreviewModal() {
+            document.getElementById("file-preview-modal").classList.add("hidden");
         }
 
         /**
@@ -293,51 +338,6 @@
          */
         function storeNotes(notes) {
             localStorage.setItem("notes", JSON.stringify(notes));
-        }
-
-        /**
-         * Opens the PDF preview modal.
-         */
-        function openPdfModal(pdfData) {
-            const pdfViewer = document.getElementById("pdf-viewer");
-            pdfViewer.innerHTML = ""; // Clear previous content
-
-            // Render PDF using PDF.js
-            pdfjsLib.getDocument({ data: atob(pdfData.split(",")[1]) }).promise.then(pdf => {
-                for (let i = 1; i <= pdf.numPages; i++) {
-                    pdf.getPage(i).then(page => {
-                        const canvas = document.createElement("canvas");
-                        const context = canvas.getContext("2d");
-                        const viewport = page.getViewport({ scale: 1.5 });
-
-                        canvas.height = viewport.height;
-                        canvas.width = viewport.width;
-
-                        pdfViewer.appendChild(canvas);
-
-                        page.render({
-                            canvasContext: context,
-                            viewport: viewport
-                        });
-                    });
-                }
-            });
-
-            document.getElementById("pdf-modal").classList.remove("hidden");
-        }
-
-        /**
-         * Closes the PDF preview modal.
-         */
-        function closePdfModal() {
-            document.getElementById("pdf-modal").classList.add("hidden");
-        }
-
-        /**
-         * Toggles dark mode.
-         */
-        function toggleDarkMode() {
-            document.body.classList.toggle("dark");
         }
     </script>
 </body>
