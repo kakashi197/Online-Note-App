@@ -19,30 +19,40 @@
         }
 
         .btn:hover {
-            transform: translateY(-2px); /* Slight lift */
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25); /* More prominent shadow */
+            transform: translateY(-2px);
+            /* Slight lift */
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25);
+            /* More prominent shadow */
         }
 
         .note-card {
             transition: transform 0.3s ease, box-shadow 0.3s ease;
-            cursor: grab; /* Indicates draggable */
+            cursor: grab;
+            /* Indicates draggable */
         }
 
         .note-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2); /* Even more prominent */
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            /* Even more prominent */
         }
 
         .glassmorphism {
-            background: rgba(255, 255, 255, 0.08); /* More subtle white */
-            backdrop-filter: blur(12px); /* More blur for depth */
-            border: 1px solid rgba(255, 255, 255, 0.15); /* Thinner, lighter border */
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37); /* Add a subtle shadow to glass */
+            background: rgba(255, 255, 255, 0.08);
+            /* More subtle white */
+            backdrop-filter: blur(12px);
+            /* More blur for depth */
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            /* Thinner, lighter border */
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            /* Add a subtle shadow to glass */
         }
 
         .dark .glassmorphism {
-            background: rgba(0, 0, 0, 0.15); /* Slightly darker for dark mode */
-            border: 1px solid rgba(255, 255, 255, 0.08); /* Lighter border in dark mode */
+            background: rgba(0, 0, 0, 0.15);
+            /* Slightly darker for dark mode */
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            /* Lighter border in dark mode */
         }
 
         /* Dragging state */
@@ -53,88 +63,104 @@
     </style>
 </head>
 
-<body class="bg-gradient-to-br from-blue-700 via-purple-700 to-pink-700 text-white min-h-screen flex items-center justify-center p-4 transition-colors duration-300">
-    <div class="max-w-3xl w-full p-8 rounded-2xl shadow-3xl text-gray-900 dark:text-white glassmorphism transform transition duration-500 hover:scale-[1.01] relative">
-        <button id="theme-toggle" class="absolute top-4 right-4 p-3 rounded-full bg-gray-700 bg-opacity-30 hover:bg-opacity-50 text-white shadow-md btn" aria-label="Toggle dark mode">
+<body
+    class="bg-gradient-to-br from-blue-700 via-purple-700 to-pink-700 text-white min-h-screen flex items-center justify-center p-4 sm:p-6 transition-colors duration-300">
+    <div
+        class="max-w-3xl w-full p-6 sm:p-8 rounded-2xl shadow-3xl text-gray-900 dark:text-white glassmorphism transform transition duration-500 hover:scale-[1.01] relative">
+        <button id="theme-toggle"
+            class="absolute top-4 right-4 p-2 sm:p-3 rounded-full bg-gray-700 bg-opacity-30 hover:bg-opacity-50 text-white shadow-md btn"
+            aria-label="Toggle dark mode">
             <i class="fas fa-moon" id="theme-icon"></i>
         </button>
 
         <div class="text-center mb-8">
             <img src="https://wallpapercave.com/wp/wp9113452.jpg" alt="Krish Solanki"
-                class="rounded-full mx-auto border-4 border-indigo-400 shadow-xl w-28 h-28 object-cover">
-            <h1 class="text-4xl font-extrabold mt-4 text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 to-purple-300">
+                class="rounded-full mx-auto border-4 border-indigo-400 shadow-xl w-24 h-24 sm:w-28 sm:h-28 object-cover">
+            <h1 class="text-3xl sm:text-4xl font-extrabold mt-4 text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 to-purple-300">
                 Online Notes App
             </h1>
-            <p class="text-gray-200 text-lg mt-1">Developed by Krish Solanki</p>
+            <p class="text-gray-200 text-base sm:text-lg mt-1">Developed by Krish Solanki</p>
         </div>
 
         <div class="flex flex-col sm:flex-row gap-3 mb-6">
             <input id="search-bar" type="text" placeholder="Search notes by title or content..."
-                class="flex-1 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-700 bg-opacity-40 border border-gray-600 text-white placeholder-gray-300">
+                class="flex-1 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-700 bg-opacity-40 border border-gray-600 text-white placeholder-gray-300 text-sm sm:text-base">
             <select id="filter-tags"
-                class="p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-700 bg-opacity-40 border border-gray-600 text-white">
+                class="p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-700 bg-opacity-40 border border-gray-600 text-white text-sm sm:text-base">
                 <option value="All">Filter by Tag: All</option>
                 <option value="General">General</option>
                 <option value="Work">Work</option>
                 <option value="Personal">Personal</option>
                 <option value="Study">Study</option>
-                </select>
+            </select>
         </div>
 
-        <div class="mb-8 p-6 rounded-xl border border-gray-600 shadow-lg bg-gray-800 bg-opacity-30">
+        <div class="mb-8 p-4 sm:p-6 rounded-xl border border-gray-600 shadow-lg bg-gray-800 bg-opacity-30">
             <input id="note-title" type="text" placeholder="Enter note title..."
-                class="w-full p-3 rounded-lg mb-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-700 bg-opacity-40 border border-gray-600 text-white placeholder-gray-300">
+                class="w-full p-3 rounded-lg mb-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-700 bg-opacity-40 border border-gray-600 text-white placeholder-gray-300 text-sm sm:text-base">
             <textarea id="note-content" placeholder="Write your note here..."
-                class="w-full p-3 h-32 rounded-lg mb-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-700 bg-opacity-40 border border-gray-600 text-white placeholder-gray-300"></textarea>
-            
+                class="w-full p-3 h-24 sm:h-32 rounded-lg mb-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-700 bg-opacity-40 border border-gray-600 text-white placeholder-gray-300 text-sm sm:text-base"></textarea>
+
             <div class="flex flex-col sm:flex-row gap-3 items-center mb-4">
-                <input id="file-input" type="file" class="flex-1 text-gray-200 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-purple-500 file:text-white hover:file:bg-purple-600 transition duration-200">
+                <input id="file-input" type="file"
+                    class="flex-1 text-gray-200 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-purple-500 file:text-white hover:file:bg-purple-600 transition duration-200">
                 <select id="note-tags"
-                    class="p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-700 bg-opacity-40 border border-gray-600 text-white">
+                    class="p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-700 bg-opacity-40 border border-gray-600 text-white text-sm sm:text-base">
                     <option value="General">General</option>
                     <option value="Work">Work</option>
                     <option value="Personal">Personal</option>
                     <option value="Study">Study</option>
                 </select>
             </div>
-            <button onclick="saveNote()" id="save-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-3 rounded-lg btn font-semibold text-lg">
+            <button onclick="saveNote()" id="save-btn"
+                class="w-full bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-3 rounded-lg btn font-semibold text-base sm:text-lg">
                 <i class="fas fa-save mr-2"></i> Save Note
             </button>
         </div>
 
-        <h3 class="text-2xl font-bold mt-8 mb-4 text-transparent bg-clip-text bg-gradient-to-r from-blue-300 to-green-300">
+        <h3
+            class="text-xl sm:text-2xl font-bold mt-8 mb-4 text-transparent bg-clip-text bg-gradient-to-r from-blue-300 to-green-300">
             Your Notes
         </h3>
-        <div id="notes-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
-            </div>
-        <p id="no-notes-message" class="text-gray-400 text-center mt-6 hidden">No notes found. Start by creating one!</p>
+        <div id="notes-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        </div>
+        <p id="no-notes-message" class="text-gray-400 text-center mt-6 hidden">No notes found. Start by creating one!
+        </p>
     </div>
 
-    <div id="confirmation-modal" class="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center hidden transition-opacity duration-300 opacity-0">
-        <div class="bg-gray-900 p-8 rounded-xl shadow-2xl text-center glassmorphism transform scale-90 transition-transform duration-300">
-            <p class="text-xl font-semibold mb-6 text-white">Are you sure you want to delete this note?</p>
-            <div class="flex gap-4 justify-center">
-                <button onclick="confirmDelete()" class="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-lg btn font-medium">
+    <div id="confirmation-modal"
+        class="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center hidden transition-opacity duration-300 opacity-0 p-4">
+        <div
+            class="bg-gray-900 p-6 sm:p-8 rounded-xl shadow-2xl text-center glassmorphism transform scale-90 transition-transform duration-300 max-w-sm w-full">
+            <p class="text-lg sm:text-xl font-semibold mb-6 text-white">Are you sure you want to delete this note?</p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <button onclick="confirmDelete()"
+                    class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg btn font-medium text-sm sm:text-base">
                     <i class="fas fa-trash-alt mr-2"></i>Yes, Delete
                 </button>
-                <button onclick="closeModal()" class="bg-gray-600 hover:bg-gray-700 text-white px-5 py-2 rounded-lg btn font-medium">
+                <button onclick="closeModal()"
+                    class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg btn font-medium text-sm sm:text-base">
                     <i class="fas fa-times-circle mr-2"></i>Cancel
                 </button>
             </div>
         </div>
     </div>
 
-    <div id="file-preview-modal" class="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center hidden transition-opacity duration-300 opacity-0">
-        <div class="bg-gray-900 p-8 rounded-xl shadow-2xl w-11/12 max-w-5xl glassmorphism transform scale-90 transition-transform duration-300">
+    <div id="file-preview-modal"
+        class="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center hidden transition-opacity duration-300 opacity-0 p-4">
+        <div
+            class="bg-gray-900 p-6 sm:p-8 rounded-xl shadow-2xl w-full max-w-full sm:max-w-5xl glassmorphism transform scale-90 transition-transform duration-300 h-[90vh] flex flex-col">
             <div class="flex justify-between items-center mb-6">
-                <h3 class="text-2xl font-bold text-white">File Preview</h3>
-                <button onclick="closeFilePreviewModal()" class="text-gray-400 hover:text-white text-2xl btn p-2 rounded-full">
+                <h3 class="text-xl sm:text-2xl font-bold text-white">File Preview</h3>
+                <button onclick="closeFilePreviewModal()" class="text-gray-400 hover:text-white text-xl sm:text-2xl btn p-2 rounded-full">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            <div id="file-preview-content" class="h-[70vh] max-h-[600px] bg-gray-800 rounded-lg overflow-auto border border-gray-700 p-2"></div>
-            <div class="flex justify-end mt-4">
-                <a id="download-file-link" href="#" download class="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-lg btn font-medium">
+            <div id="file-preview-content"
+                class="flex-grow bg-gray-800 rounded-lg overflow-auto border border-gray-700 p-2 sm:p-4 mb-4"></div>
+            <div class="flex justify-end mt-auto">
+                <a id="download-file-link" href="#" download
+                    class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg btn font-medium text-sm sm:text-base">
                     <i class="fas fa-download mr-2"></i>Download File
                 </a>
             </div>
@@ -266,7 +292,7 @@
 
             const filteredNotes = sortedNotes.filter(note => {
                 const matchesSearch = note.title.toLowerCase().includes(searchQuery) ||
-                                      note.content.toLowerCase().includes(searchQuery);
+                    note.content.toLowerCase().includes(searchQuery);
                 const matchesTag = filterTag === "All" || note.tag === filterTag;
                 return matchesSearch && matchesTag;
             });
@@ -287,38 +313,38 @@
          */
         function createNoteCard(note) {
             let noteDiv = document.createElement("div");
-            noteDiv.className = `p-6 rounded-xl shadow-lg note-card border border-gray-700 flex flex-col justify-between h-full
+            noteDiv.className = `p-4 sm:p-6 rounded-xl shadow-lg note-card border border-gray-700 flex flex-col justify-between h-full
                                  ${note.pinned ? 'bg-indigo-900 bg-opacity-40 border-indigo-500' : 'bg-gray-800 bg-opacity-30'}`;
             noteDiv.setAttribute('data-id', note.id || Date.now()); // Ensure each note has a unique ID
             if (!note.id) note.id = Date.now(); // Assign ID if missing for existing notes
 
             noteDiv.innerHTML = `
                 <div class="flex justify-between items-start mb-3">
-                    <strong class="text-xl font-bold text-indigo-300 break-words pr-2">${note.title}</strong>
-                    <button onclick="togglePinNote('${note.id}')" class="text-xl p-1 rounded-full hover:bg-gray-700 transition-colors duration-200" aria-label="Pin note">
+                    <strong class="text-lg sm:text-xl font-bold text-indigo-300 break-words pr-2">${note.title}</strong>
+                    <button onclick="togglePinNote('${note.id}')" class="text-lg sm:text-xl p-1 rounded-full hover:bg-gray-700 transition-colors duration-200" aria-label="Pin note">
                         <i class="${note.pinned ? 'fas fa-thumbtack text-yellow-400' : 'far fa-thumbtack text-gray-400'}"></i>
                     </button>
                 </div>
-                <p class="text-gray-300 mt-1 mb-2 flex-grow overflow-hidden text-ellipsis whitespace-nowrap">${note.content}</p>
-                <div class="flex items-center justify-between text-sm text-gray-400 mt-2">
+                <p class="text-gray-300 text-sm sm:text-base mt-1 mb-2 flex-grow overflow-hidden text-ellipsis whitespace-nowrap">${note.content}</p>
+                <div class="flex items-center justify-between text-xs sm:text-sm text-gray-400 mt-2">
                     <span><i class="fas fa-tag mr-1"></i> ${note.tag}</span>
                     <span><i class="fas fa-clock mr-1"></i> ${note.lastModified || note.date}</span>
                 </div>
                 ${note.file ? `
                     <div class="mt-4 flex flex-wrap gap-2">
-                        <button onclick="openFilePreviewModal('${note.file.data}', '${note.file.type}', '${note.file.name}')" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg btn text-sm">
+                        <button onclick="openFilePreviewModal('${note.file.data}', '${note.file.type}', '${note.file.name}')" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg btn text-xs sm:text-sm">
                             <i class="fas fa-eye mr-1"></i> Preview
                         </button>
-                        <a href="${note.file.data}" download="${note.file.name}" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded-lg btn text-sm">
+                        <a href="${note.file.data}" download="${note.file.name}" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded-lg btn text-xs sm:text-sm">
                             <i class="fas fa-download mr-1"></i> Download
                         </a>
                     </div>
                 ` : ""}
                 <div class="mt-4 flex gap-3">
-                    <button onclick="editNote('${note.id}')" class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1.5 rounded-lg btn flex-1 text-sm">
+                    <button onclick="editNote('${note.id}')" class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1.5 rounded-lg btn flex-1 text-xs sm:text-sm">
                         <i class="fas fa-edit mr-1"></i> Edit
                     </button>
-                    <button onclick="openDeleteModal('${note.id}')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-lg btn flex-1 text-sm">
+                    <button onclick="openDeleteModal('${note.id}')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-lg btn flex-1 text-xs sm:text-sm">
                         <i class="fas fa-trash-alt mr-1"></i> Delete
                     </button>
                 </div>
@@ -369,7 +395,7 @@
 
                                 canvas.height = viewport.height;
                                 canvas.width = viewport.width;
-                                canvas.classList.add("mb-4", "shadow-lg", "rounded-md", "border", "border-gray-700"); // Add styling to canvas
+                                canvas.classList.add("mb-4", "shadow-lg", "rounded-md", "border", "border-gray-700", "max-w-full", "h-auto"); // Added max-w-full, h-auto for responsiveness
 
                                 filePreviewContent.appendChild(canvas);
 
