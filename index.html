@@ -4,124 +4,191 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Online Notes App - Krish Solanki</title>
+    <title>Advanced Notes App - Krish Solanki</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Inter', sans-serif;
         }
 
         .btn {
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
         }
 
         .btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transform: translateY(-2px); /* Slight lift */
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25); /* More prominent shadow */
         }
 
         .note-card {
             transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: grab; /* Indicates draggable */
         }
 
         .note-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2); /* Even more prominent */
         }
 
         .glassmorphism {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.08); /* More subtle white */
+            backdrop-filter: blur(12px); /* More blur for depth */
+            border: 1px solid rgba(255, 255, 255, 0.15); /* Thinner, lighter border */
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37); /* Add a subtle shadow to glass */
         }
 
         .dark .glassmorphism {
-            background: rgba(0, 0, 0, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.15); /* Slightly darker for dark mode */
+            border: 1px solid rgba(255, 255, 255, 0.08); /* Lighter border in dark mode */
+        }
+
+        /* Dragging state */
+        .note-card.dragging {
+            opacity: 0.5;
+            transform: scale(0.98);
         }
     </style>
 </head>
 
-<body class="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 dark:bg-gradient-to-r dark:from-gray-800 dark:via-gray-900 dark:to-black p-6 text-white min-h-screen flex items-center justify-center">
-    <div class="max-w-2xl w-full bg-white dark:bg-gray-800 p-6 rounded-lg shadow-2xl text-gray-900 dark:text-white transform transition duration-500 hover:scale-105">
-        <!-- Header Section -->
-        <div class="text-center mb-4">
-            <img src="https://wallpapercave.com/wp/wp9113452.jpg" alt="Krish Solanki"
-                class="rounded-full mx-auto border-4 border-indigo-500 shadow-lg w-24 h-24">
-            <h2 class="text-2xl font-bold mt-2">Online Notes App</h2>
-            <p class="text-gray-600 dark:text-gray-300">Developed by Krish Solanki</p>
-        </div>
-
-        <!-- Search Bar -->
-        <input id="search-bar" type="text" placeholder="Search notes..."
-            class="w-full p-3 border rounded-lg mb-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-
-        <!-- Note Input Section -->
-        <input id="note-title" type="text" placeholder="Enter title..."
-            class="w-full p-3 border rounded-lg mb-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-        <textarea id="note-content" placeholder="Write your note here..."
-            class="w-full p-3 border rounded-lg mb-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"></textarea>
-        <input id="file-input" type="file" class="mb-3 text-gray-600 dark:text-gray-300">
-        <select id="note-tags"
-            class="w-full p-3 border rounded-lg mb-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-            <option value="General">General</option>
-            <option value="Work">Work</option>
-            <option value="Personal">Personal</option>
-            <option value="Study">Study</option>
-        </select>
-        <button onclick="saveNote()" id="save-btn" class="w-full bg-indigo-500 text-white px-4 py-2 rounded-lg btn">
-            <i class="fas fa-save"></i> Save Note
+<body class="bg-gradient-to-br from-blue-700 via-purple-700 to-pink-700 text-white min-h-screen flex items-center justify-center p-4 transition-colors duration-300">
+    <div class="max-w-3xl w-full p-8 rounded-2xl shadow-3xl text-gray-900 dark:text-white glassmorphism transform transition duration-500 hover:scale-[1.01] relative">
+        <button id="theme-toggle" class="absolute top-4 right-4 p-3 rounded-full bg-gray-700 bg-opacity-30 hover:bg-opacity-50 text-white shadow-md btn" aria-label="Toggle dark mode">
+            <i class="fas fa-moon" id="theme-icon"></i>
         </button>
 
-        <!-- Notes Display Section -->
-        <h3 class="text-lg font-semibold mt-6">Your Notes</h3>
-        <div id="notes-container" class="mt-3 space-y-3"></div>
+        <div class="text-center mb-8">
+            <img src="https://wallpapercave.com/wp/wp9113452.jpg" alt="Krish Solanki"
+                class="rounded-full mx-auto border-4 border-indigo-400 shadow-xl w-28 h-28 object-cover">
+            <h1 class="text-4xl font-extrabold mt-4 text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 to-purple-300">
+                Online Notes App
+            </h1>
+            <p class="text-gray-200 text-lg mt-1">Developed by Krish Solanki</p>
+        </div>
+
+        <div class="flex flex-col sm:flex-row gap-3 mb-6">
+            <input id="search-bar" type="text" placeholder="Search notes by title or content..."
+                class="flex-1 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-700 bg-opacity-40 border border-gray-600 text-white placeholder-gray-300">
+            <select id="filter-tags"
+                class="p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-700 bg-opacity-40 border border-gray-600 text-white">
+                <option value="All">Filter by Tag: All</option>
+                <option value="General">General</option>
+                <option value="Work">Work</option>
+                <option value="Personal">Personal</option>
+                <option value="Study">Study</option>
+                </select>
+        </div>
+
+        <div class="mb-8 p-6 rounded-xl border border-gray-600 shadow-lg bg-gray-800 bg-opacity-30">
+            <input id="note-title" type="text" placeholder="Enter note title..."
+                class="w-full p-3 rounded-lg mb-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-700 bg-opacity-40 border border-gray-600 text-white placeholder-gray-300">
+            <textarea id="note-content" placeholder="Write your note here..."
+                class="w-full p-3 h-32 rounded-lg mb-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-700 bg-opacity-40 border border-gray-600 text-white placeholder-gray-300"></textarea>
+            
+            <div class="flex flex-col sm:flex-row gap-3 items-center mb-4">
+                <input id="file-input" type="file" class="flex-1 text-gray-200 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-purple-500 file:text-white hover:file:bg-purple-600 transition duration-200">
+                <select id="note-tags"
+                    class="p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-700 bg-opacity-40 border border-gray-600 text-white">
+                    <option value="General">General</option>
+                    <option value="Work">Work</option>
+                    <option value="Personal">Personal</option>
+                    <option value="Study">Study</option>
+                </select>
+            </div>
+            <button onclick="saveNote()" id="save-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-3 rounded-lg btn font-semibold text-lg">
+                <i class="fas fa-save mr-2"></i> Save Note
+            </button>
+        </div>
+
+        <h3 class="text-2xl font-bold mt-8 mb-4 text-transparent bg-clip-text bg-gradient-to-r from-blue-300 to-green-300">
+            Your Notes
+        </h3>
+        <div id="notes-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
+            </div>
+        <p id="no-notes-message" class="text-gray-400 text-center mt-6 hidden">No notes found. Start by creating one!</p>
     </div>
 
-    <!-- Confirmation Modal -->
-    <div id="confirmation-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center">
-        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg text-center glassmorphism">
-            <p class="text-lg font-semibold mb-4 dark:text-white">Are you sure you want to delete this note?</p>
-            <div class="flex gap-3 justify-center">
-                <button onclick="confirmDelete()" class="bg-red-500 text-white px-4 py-2 rounded-lg btn">Yes, Delete</button>
-                <button onclick="closeModal()" class="bg-gray-500 text-white px-4 py-2 rounded-lg btn">Cancel</button>
+    <div id="confirmation-modal" class="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center hidden transition-opacity duration-300 opacity-0">
+        <div class="bg-gray-900 p-8 rounded-xl shadow-2xl text-center glassmorphism transform scale-90 transition-transform duration-300">
+            <p class="text-xl font-semibold mb-6 text-white">Are you sure you want to delete this note?</p>
+            <div class="flex gap-4 justify-center">
+                <button onclick="confirmDelete()" class="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-lg btn font-medium">
+                    <i class="fas fa-trash-alt mr-2"></i>Yes, Delete
+                </button>
+                <button onclick="closeModal()" class="bg-gray-600 hover:bg-gray-700 text-white px-5 py-2 rounded-lg btn font-medium">
+                    <i class="fas fa-times-circle mr-2"></i>Cancel
+                </button>
             </div>
         </div>
     </div>
 
-    <!-- File Preview Modal -->
-    <div id="file-preview-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center">
-        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg w-11/12 max-w-4xl glassmorphism">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-xl font-bold dark:text-white">File Preview</h3>
-                <button onclick="closeFilePreviewModal()" class="text-gray-500 hover:text-gray-700 dark:text-gray-300">
+    <div id="file-preview-modal" class="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center hidden transition-opacity duration-300 opacity-0">
+        <div class="bg-gray-900 p-8 rounded-xl shadow-2xl w-11/12 max-w-5xl glassmorphism transform scale-90 transition-transform duration-300">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-white">File Preview</h3>
+                <button onclick="closeFilePreviewModal()" class="text-gray-400 hover:text-white text-2xl btn p-2 rounded-full">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            <div id="file-preview-content" class="h-[80vh] overflow-auto"></div>
+            <div id="file-preview-content" class="h-[70vh] max-h-[600px] bg-gray-800 rounded-lg overflow-auto border border-gray-700 p-2"></div>
+            <div class="flex justify-end mt-4">
+                <a id="download-file-link" href="#" download class="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-lg btn font-medium">
+                    <i class="fas fa-download mr-2"></i>Download File
+                </a>
+            </div>
         </div>
     </div>
 
     <script>
         document.addEventListener("DOMContentLoaded", initializeApp);
 
-        let editingIndex = null; // Stores index of note being edited
-        let deleteIndex = null; // Stores index of note to be deleted
+        let editingIndex = null;
+        let deleteIndex = null;
+        let notesData = []; // Centralized data store
 
         /**
          * Initializes the application on page load.
          */
         function initializeApp() {
             loadNotes();
-            document.getElementById("search-bar").addEventListener("input", loadNotes);
+            document.getElementById("search-bar").addEventListener("input", renderNotes);
+            document.getElementById("filter-tags").addEventListener("change", renderNotes);
+            document.getElementById("theme-toggle").addEventListener("click", toggleTheme);
+            setupDragAndDrop(); // Initialize drag and drop
+            checkNoNotesMessage();
+        }
+
+        /**
+         * Toggles between light and dark themes.
+         */
+        function toggleTheme() {
+            document.body.classList.toggle("dark");
+            const themeIcon = document.getElementById("theme-icon");
+            if (document.body.classList.contains("dark")) {
+                themeIcon.classList.remove("fa-moon");
+                themeIcon.classList.add("fa-sun");
+                localStorage.setItem("theme", "dark");
+            } else {
+                themeIcon.classList.remove("fa-sun");
+                themeIcon.classList.add("fa-moon");
+                localStorage.setItem("theme", "light");
+            }
+        }
+
+        /**
+         * Loads notes from localStorage into notesData and then renders them.
+         */
+        function loadNotes() {
+            notesData = getStoredNotes();
+            renderNotes();
         }
 
         /**
          * Saves a new note or updates an existing one.
          */
-        function saveNote() {
+        async function saveNote() {
             let title = document.getElementById("note-title").value.trim();
             let content = document.getElementById("note-content").value.trim();
             let tag = document.getElementById("note-tags").value;
@@ -133,78 +200,126 @@
                 return;
             }
 
-            let reader = new FileReader();
-            reader.onload = function () {
-                let fileData = file ? { name: file.name, data: reader.result, type: file.type } : null;
-                let notes = getStoredNotes();
-
-                if (editingIndex !== null) {
-                    // Update existing note
-                    notes[editingIndex] = { title, content, tag, file: fileData, date: getFormattedDate() };
-                    editingIndex = null;
-                    updateSaveButton("Save Note");
-                } else {
-                    // Add new note
-                    notes.push({ title, content, tag, file: fileData, date: getFormattedDate() });
+            let fileData = null;
+            if (file) {
+                try {
+                    fileData = await readFileAsync(file);
+                } catch (error) {
+                    console.error("Error reading file:", error);
+                    alert("Could not read file. Please try again.");
+                    return;
                 }
+            }
 
-                storeNotes(notes);
-                resetForm();
-                loadNotes();
+            const newNote = {
+                title,
+                content,
+                tag,
+                file: fileData,
+                date: getFormattedDateTime(), // Use full date and time
+                lastModified: getFormattedDateTime(), // New: Last modified timestamp
+                pinned: false // New: Pinning status
             };
 
-            if (file) {
-                reader.readAsDataURL(file);
+            if (editingIndex !== null) {
+                notesData[editingIndex] = { ...notesData[editingIndex], ...newNote }; // Merge existing with new data
+                editingIndex = null;
+                updateSaveButton("Save Note", "fas fa-save");
             } else {
-                reader.onload();
+                notesData.unshift(newNote); // Add new notes to the top
             }
+
+            storeNotes(notesData);
+            resetForm();
+            renderNotes(); // Re-render to reflect changes
         }
 
         /**
-         * Loads and displays all notes from localStorage.
+         * Helper function to read file as Data URL.
          */
-        function loadNotes() {
+        function readFileAsync(file) {
+            return new Promise((resolve, reject) => {
+                let reader = new FileReader();
+                reader.onload = () => {
+                    resolve({ name: file.name, data: reader.result, type: file.type });
+                };
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        /**
+         * Renders notes based on search query and filter tag.
+         */
+        function renderNotes() {
             let notesContainer = document.getElementById("notes-container");
             notesContainer.innerHTML = "";
-            let notes = getStoredNotes();
             let searchQuery = document.getElementById("search-bar").value.toLowerCase();
+            let filterTag = document.getElementById("filter-tags").value;
 
-            // Sort notes based on search relevance
-            notes.sort((a, b) => b.title.toLowerCase().includes(searchQuery) - a.title.toLowerCase().includes(searchQuery));
-
-            notes.forEach((note, index) => {
-                let noteCard = createNoteCard(note, index);
-                notesContainer.appendChild(noteCard);
+            // Sort: Pinned notes first, then by last modified (newest first)
+            const sortedNotes = [...notesData].sort((a, b) => {
+                if (a.pinned && !b.pinned) return -1;
+                if (!a.pinned && b.pinned) return 1;
+                return new Date(b.lastModified).getTime() - new Date(a.lastModified).getTime();
             });
+
+            const filteredNotes = sortedNotes.filter(note => {
+                const matchesSearch = note.title.toLowerCase().includes(searchQuery) ||
+                                      note.content.toLowerCase().includes(searchQuery);
+                const matchesTag = filterTag === "All" || note.tag === filterTag;
+                return matchesSearch && matchesTag;
+            });
+
+            if (filteredNotes.length === 0) {
+                document.getElementById("no-notes-message").classList.remove("hidden");
+            } else {
+                document.getElementById("no-notes-message").classList.add("hidden");
+                filteredNotes.forEach((note) => {
+                    let noteCard = createNoteCard(note);
+                    notesContainer.appendChild(noteCard);
+                });
+            }
         }
 
         /**
          * Creates a note card element.
          */
-        function createNoteCard(note, index) {
+        function createNoteCard(note) {
             let noteDiv = document.createElement("div");
-            noteDiv.className = "p-4 bg-gray-200 dark:bg-gray-700 rounded-lg shadow-md note-card";
+            noteDiv.className = `p-6 rounded-xl shadow-lg note-card border border-gray-700 flex flex-col justify-between h-full
+                                 ${note.pinned ? 'bg-indigo-900 bg-opacity-40 border-indigo-500' : 'bg-gray-800 bg-opacity-30'}`;
+            noteDiv.setAttribute('data-id', note.id || Date.now()); // Ensure each note has a unique ID
+            if (!note.id) note.id = Date.now(); // Assign ID if missing for existing notes
+
             noteDiv.innerHTML = `
-                <strong class="text-indigo-700 dark:text-indigo-300">${note.title}</strong>
-                <p class="text-gray-700 dark:text-gray-300 mt-1">${note.content}</p>
-                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Tag: ${note.tag}</p>
-                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Date: ${note.date}</p>
+                <div class="flex justify-between items-start mb-3">
+                    <strong class="text-xl font-bold text-indigo-300 break-words pr-2">${note.title}</strong>
+                    <button onclick="togglePinNote('${note.id}')" class="text-xl p-1 rounded-full hover:bg-gray-700 transition-colors duration-200" aria-label="Pin note">
+                        <i class="${note.pinned ? 'fas fa-thumbtack text-yellow-400' : 'far fa-thumbtack text-gray-400'}"></i>
+                    </button>
+                </div>
+                <p class="text-gray-300 mt-1 mb-2 flex-grow overflow-hidden text-ellipsis whitespace-nowrap">${note.content}</p>
+                <div class="flex items-center justify-between text-sm text-gray-400 mt-2">
+                    <span><i class="fas fa-tag mr-1"></i> ${note.tag}</span>
+                    <span><i class="fas fa-clock mr-1"></i> ${note.lastModified || note.date}</span>
+                </div>
                 ${note.file ? `
-                    <div class="mt-2">
-                        <button onclick="openFilePreviewModal('${note.file.data}', '${note.file.type}')" class="bg-blue-500 text-white px-3 py-1 rounded-lg btn">
-                            <i class="fas fa-eye"></i> Preview File
+                    <div class="mt-4 flex flex-wrap gap-2">
+                        <button onclick="openFilePreviewModal('${note.file.data}', '${note.file.type}', '${note.file.name}')" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg btn text-sm">
+                            <i class="fas fa-eye mr-1"></i> Preview
                         </button>
-                        <a href="${note.file.data}" download="${note.file.name}" class="bg-green-500 text-white px-3 py-1 rounded-lg btn">
-                            <i class="fas fa-download"></i> Download
+                        <a href="${note.file.data}" download="${note.file.name}" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded-lg btn text-sm">
+                            <i class="fas fa-download mr-1"></i> Download
                         </a>
                     </div>
                 ` : ""}
-                <div class="mt-3 flex gap-3">
-                    <button onclick="editNote(${index})" class="bg-green-500 text-white px-3 py-1 rounded-lg btn">
-                        <i class="fas fa-edit"></i> Edit
+                <div class="mt-4 flex gap-3">
+                    <button onclick="editNote('${note.id}')" class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1.5 rounded-lg btn flex-1 text-sm">
+                        <i class="fas fa-edit mr-1"></i> Edit
                     </button>
-                    <button onclick="openDeleteModal(${index})" class="bg-red-500 text-white px-3 py-1 rounded-lg btn">
-                        <i class="fas fa-trash"></i> Delete
+                    <button onclick="openDeleteModal('${note.id}')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-lg btn flex-1 text-sm">
+                        <i class="fas fa-trash-alt mr-1"></i> Delete
                     </button>
                 </div>
             `;
@@ -214,78 +329,135 @@
         /**
          * Opens the file preview modal.
          */
-        function openFilePreviewModal(fileData, fileType) {
+        function openFilePreviewModal(fileData, fileType, fileName) {
             const filePreviewContent = document.getElementById("file-preview-content");
+            const downloadLink = document.getElementById("download-file-link");
             filePreviewContent.innerHTML = ""; // Clear previous content
 
+            downloadLink.href = fileData;
+            downloadLink.download = fileName;
+
             if (fileType.startsWith("image/")) {
-                // Display image
-                filePreviewContent.innerHTML = `<img src="${fileData}" alt="Preview" class="w-full h-auto">`;
-            } else if (fileType === "application/pdf") {
-                // Render PDF using PDF.js
-                pdfjsLib.getDocument({ data: atob(fileData.split(",")[1]) }).promise.then(pdf => {
-                    for (let i = 1; i <= pdf.numPages; i++) {
-                        pdf.getPage(i).then(page => {
-                            const canvas = document.createElement("canvas");
-                            const context = canvas.getContext("2d");
-                            const viewport = page.getViewport({ scale: 1.5 });
-
-                            canvas.height = viewport.height;
-                            canvas.width = viewport.width;
-
-                            filePreviewContent.appendChild(canvas);
-
-                            page.render({
-                                canvasContext: context,
-                                viewport: viewport
-                            });
-                        });
+                filePreviewContent.innerHTML = `<img src="${fileData}" alt="Preview" class="max-w-full h-auto mx-auto rounded-lg shadow-md">`;
+            } else if (fileType.includes("text/")) { // Basic text preview
+                fetch(fileData)
+                    .then(res => res.text())
+                    .then(text => {
+                        filePreviewContent.innerHTML = `<pre class="whitespace-pre-wrap font-mono text-gray-200">${text}</pre>`;
+                    })
+                    .catch(err => {
+                        filePreviewContent.innerHTML = `<p class="text-center text-red-400">Could not load text content.</p>`;
+                        console.error("Error fetching text file:", err);
+                    });
+            } else if (fileType === "application/pdf" && typeof pdfjsLib !== 'undefined') {
+                try {
+                    // PDF.js expects raw binary data, so convert base64 to Uint8Array
+                    const base64 = fileData.split(',')[1];
+                    const binaryString = atob(base64);
+                    const len = binaryString.length;
+                    const bytes = new Uint8Array(len);
+                    for (let i = 0; i < len; i++) {
+                        bytes[i] = binaryString.charCodeAt(i);
                     }
-                });
+
+                    pdfjsLib.getDocument({ data: bytes }).promise.then(pdf => {
+                        for (let i = 1; i <= pdf.numPages; i++) {
+                            pdf.getPage(i).then(page => {
+                                const canvas = document.createElement("canvas");
+                                const context = canvas.getContext("2d");
+                                const viewport = page.getViewport({ scale: 1.5 });
+
+                                canvas.height = viewport.height;
+                                canvas.width = viewport.width;
+                                canvas.classList.add("mb-4", "shadow-lg", "rounded-md", "border", "border-gray-700"); // Add styling to canvas
+
+                                filePreviewContent.appendChild(canvas);
+
+                                page.render({
+                                    canvasContext: context,
+                                    viewport: viewport
+                                });
+                            });
+                        }
+                    }).catch(err => {
+                        filePreviewContent.innerHTML = `<p class="text-center text-red-400">Failed to load PDF. ${err.message}</p>`;
+                        console.error("PDF.js error:", err);
+                    });
+                } catch (e) {
+                    filePreviewContent.innerHTML = `<p class="text-center text-red-400">Error processing PDF data. Please ensure the file is valid.</p>`;
+                    console.error("PDF processing error:", e);
+                }
             } else {
-                // Unsupported file type
-                filePreviewContent.innerHTML = `<p class="text-center">Preview not available. Please download the file.</p>`;
+                filePreviewContent.innerHTML = `<p class="text-center text-gray-400 py-8">
+                                                    Preview not available for this file type.<br>
+                                                    Please use the download button to view the file.
+                                                </p>`;
             }
 
-            document.getElementById("file-preview-modal").classList.remove("hidden");
+            const modal = document.getElementById("file-preview-modal");
+            modal.classList.remove("hidden");
+            setTimeout(() => { // Trigger transition
+                modal.classList.add("opacity-100");
+                modal.querySelector(".glassmorphism").classList.remove("scale-90");
+            }, 10);
         }
 
         /**
          * Closes the file preview modal.
          */
         function closeFilePreviewModal() {
-            document.getElementById("file-preview-modal").classList.add("hidden");
+            const modal = document.getElementById("file-preview-modal");
+            modal.classList.remove("opacity-100");
+            modal.querySelector(".glassmorphism").classList.add("scale-90");
+            setTimeout(() => { // Hide after transition
+                modal.classList.add("hidden");
+                document.getElementById("file-preview-content").innerHTML = ""; // Clear content
+            }, 300);
         }
 
         /**
          * Edits a note by populating the form fields.
          */
-        function editNote(index) {
-            let notes = getStoredNotes();
-            let note = notes[index];
+        function editNote(id) {
+            const index = notesData.findIndex(note => note.id == id);
+            if (index === -1) return;
 
+            const note = notesData[index];
             document.getElementById("note-title").value = note.title;
             document.getElementById("note-content").value = note.content;
             document.getElementById("note-tags").value = note.tag;
+            // File input cannot be programmatically set for security reasons
+            // User would need to re-upload if they want to change the file
 
             editingIndex = index;
-            updateSaveButton("Update Note");
+            updateSaveButton("Update Note", "fas fa-sync-alt"); // Change icon to update
+            window.scrollTo({ top: 0, behavior: 'smooth' }); // Scroll to top to make form visible
         }
 
         /**
          * Opens the delete confirmation modal.
          */
-        function openDeleteModal(index) {
-            deleteIndex = index;
-            document.getElementById("confirmation-modal").classList.remove("hidden");
+        function openDeleteModal(id) {
+            deleteIndex = id; // Store the ID directly
+            const modal = document.getElementById("confirmation-modal");
+            modal.classList.remove("hidden");
+            setTimeout(() => { // Trigger transition
+                modal.classList.add("opacity-100");
+                modal.querySelector(".glassmorphism").classList.remove("scale-90");
+            }, 10);
         }
 
         /**
          * Closes the delete confirmation modal.
          */
-        function closeDeleteModal() {
-            deleteIndex = null;
-            document.getElementById("confirmation-modal").classList.add("hidden");
+        function closeModal() { // Renamed from closeDeleteModal for generic use
+            const modal = document.getElementById("confirmation-modal");
+            modal.classList.remove("opacity-100");
+            modal.querySelector(".glassmorphism").classList.add("scale-90");
+            setTimeout(() => { // Hide after transition
+                modal.classList.add("hidden");
+                deleteIndex = null;
+            }, 300);
         }
 
         /**
@@ -293,11 +465,11 @@
          */
         function confirmDelete() {
             if (deleteIndex !== null) {
-                let notes = getStoredNotes();
-                notes.splice(deleteIndex, 1);
-                storeNotes(notes);
-                loadNotes();
-                closeDeleteModal();
+                notesData = notesData.filter(note => note.id != deleteIndex);
+                storeNotes(notesData);
+                renderNotes();
+                closeModal();
+                checkNoNotesMessage();
             }
         }
 
@@ -307,30 +479,35 @@
         function resetForm() {
             document.getElementById("note-title").value = "";
             document.getElementById("note-content").value = "";
-            document.getElementById("file-input").value = "";
+            document.getElementById("file-input").value = ""; // Clear file input
             document.getElementById("note-tags").value = "General";
-            updateSaveButton("Save Note");
+            editingIndex = null; // Reset editing state
+            updateSaveButton("Save Note", "fas fa-save");
         }
 
         /**
-         * Updates the save button text.
+         * Updates the save button text and icon.
          */
-        function updateSaveButton(text) {
-            document.getElementById("save-btn").innerText = text;
+        function updateSaveButton(text, iconClass) {
+            const saveBtn = document.getElementById("save-btn");
+            saveBtn.innerHTML = `<i class="${iconClass} mr-2"></i> ${text}`;
         }
 
         /**
          * Gets the current date and time in a readable format.
          */
-        function getFormattedDate() {
-            return new Date().toLocaleString();
+        function getFormattedDateTime() {
+            const now = new Date();
+            const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true };
+            return now.toLocaleString('en-US', options);
         }
 
         /**
          * Retrieves notes from localStorage.
          */
         function getStoredNotes() {
-            return JSON.parse(localStorage.getItem("notes")) || [];
+            const stored = localStorage.getItem("notes");
+            return stored ? JSON.parse(stored) : [];
         }
 
         /**
@@ -338,6 +515,97 @@
          */
         function storeNotes(notes) {
             localStorage.setItem("notes", JSON.stringify(notes));
+        }
+
+        /**
+         * Toggles the pinned status of a note.
+         */
+        function togglePinNote(id) {
+            const index = notesData.findIndex(note => note.id == id);
+            if (index !== -1) {
+                notesData[index].pinned = !notesData[index].pinned;
+                storeNotes(notesData);
+                renderNotes(); // Re-render to show pinned notes at top
+            }
+        }
+
+        /**
+         * Sets up drag and drop functionality for notes.
+         */
+        let dragSrcEl = null;
+
+        function setupDragAndDrop() {
+            const notesContainer = document.getElementById("notes-container");
+
+            notesContainer.addEventListener('dragstart', (e) => {
+                const targetCard = e.target.closest('.note-card');
+                if (targetCard) {
+                    targetCard.classList.add('dragging');
+                    dragSrcEl = targetCard;
+                    e.dataTransfer.effectAllowed = 'move';
+                    e.dataTransfer.setData('text/plain', targetCard.dataset.id); // Set data to transfer
+                }
+            });
+
+            notesContainer.addEventListener('dragover', (e) => {
+                e.preventDefault(); // Necessary to allow drop
+                const targetCard = e.target.closest('.note-card');
+                if (targetCard && targetCard !== dragSrcEl) {
+                    const bounding = targetCard.getBoundingClientRect();
+                    const offset = bounding.y + (bounding.height / 2);
+                    if (e.clientY < offset) {
+                        notesContainer.insertBefore(dragSrcEl, targetCard);
+                    } else {
+                        notesContainer.insertBefore(dragSrcEl, targetCard.nextSibling);
+                    }
+                }
+            });
+
+            notesContainer.addEventListener('dragenter', (e) => {
+                e.preventDefault();
+            });
+
+            notesContainer.addEventListener('dragleave', (e) => {
+                // Not strictly needed for this simple reordering, but good practice
+            });
+
+            notesContainer.addEventListener('drop', (e) => {
+                e.preventDefault();
+                // The actual reordering happened in dragover, now just update notesData
+                const droppedId = e.dataTransfer.getData('text/plain');
+                if (droppedId && dragSrcEl) {
+                    const oldIndex = notesData.findIndex(note => note.id == droppedId);
+                    const newIndex = Array.from(notesContainer.children).indexOf(dragSrcEl);
+
+                    if (oldIndex !== -1 && newIndex !== -1 && oldIndex !== newIndex) {
+                        const [movedNote] = notesData.splice(oldIndex, 1);
+                        notesData.splice(newIndex, 0, movedNote);
+                        storeNotes(notesData); // Save the new order
+                        renderNotes(); // Re-render to ensure visual consistency
+                    }
+                }
+            });
+
+            notesContainer.addEventListener('dragend', (e) => {
+                const targetCard = e.target.closest('.note-card');
+                if (targetCard) {
+                    targetCard.classList.remove('dragging');
+                }
+                dragSrcEl = null;
+            });
+        }
+
+        /**
+         * Checks if there are any notes and shows/hides the "No notes found" message.
+         */
+        function checkNoNotesMessage() {
+            const notesContainer = document.getElementById("notes-container");
+            const noNotesMessage = document.getElementById("no-notes-message");
+            if (notesContainer.children.length === 0) {
+                noNotesMessage.classList.remove("hidden");
+            } else {
+                noNotesMessage.classList.add("hidden");
+            }
         }
     </script>
 </body>
